@@ -3,6 +3,7 @@ package level
 import (
 	"github.com/FluffyFoxTail/gorogue/gamedata"
 	"github.com/FluffyFoxTail/gorogue/gamedata/level/maptile"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 // Level hold information about tile for dungeon level
@@ -17,6 +18,17 @@ func NewLevel(gd *gamedata.GameData) (level *Level) {
 	return
 }
 
+func (l *Level) DrawLevel(gd *gamedata.GameData, screen *ebiten.Image) {
+	for x := 0; x < gd.ScreenWidth; x++ {
+		for y := 0; y < gd.ScreenHeight; y++ {
+			tile := l.Tiles[l.GetIndexFromXY(x, y, gd)]
+			options := &ebiten.DrawImageOptions{}
+
+			options.GeoM.Translate(float64(tile.PixelX), float64(tile.PixelY))
+			screen.DrawImage(tile.Image, options)
+		}
+	}
+}
 func (l *Level) CreateTiles(gd *gamedata.GameData) []*maptile.MapTile {
 	tiles := make([]*maptile.MapTile, 0)
 

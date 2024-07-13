@@ -1,4 +1,4 @@
-package dungeon
+package gamedata
 
 import "github.com/FluffyFoxTail/gorogue/gamedata/level"
 

@@ -1,8 +1,8 @@
 package level
 
 import (
-	"github.com/FluffyFoxTail/gorogue/gamedata"
-	"github.com/FluffyFoxTail/gorogue/gamedata/level/maptile"
+	"github.com/FluffyFoxTail/gorogue/game/gamedata"
+	"github.com/FluffyFoxTail/gorogue/game/gamedata/level/maptile"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 

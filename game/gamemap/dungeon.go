@@ -1,7 +1,7 @@
-package gamedata
+package gamemap
 
 import (
-	"github.com/FluffyFoxTail/gorogue/game/gamedata/level"
+	"github.com/FluffyFoxTail/gorogue/game/gamemap/level"
 )
 
 // Dungeon is container for all levels at particular dungeon in the game world

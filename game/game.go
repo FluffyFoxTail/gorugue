@@ -1,25 +1,25 @@
 package game
 
 import (
-	"github.com/FluffyFoxTail/gorogue/ecs_system"
-	"github.com/FluffyFoxTail/gorogue/ecs_system/components"
-	gamedata2 "github.com/FluffyFoxTail/gorogue/game/gamedata"
-	"github.com/FluffyFoxTail/gorogue/game/gamedata/level"
+	"github.com/FluffyFoxTail/gorogue/game/gamedata"
+	"github.com/FluffyFoxTail/gorogue/game/gamemap"
+	"github.com/FluffyFoxTail/gorogue/game/gamemap/level"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 // Game holds all data about entire game
 type Game struct {
-	*gamedata2.GameData
-	*gamedata2.GameMap
-	World *ecs_system.World
+	*gamedata.GameData
+	*gamemap.GameMap
+	World *World
 }
 
 // NewGame creates a new Game Object and initializes the data
-func NewGame(gd *gamedata2.GameData) *Game {
-	world := ecs_system.InitializeWorld()
+func NewGame() *Game {
+	gd := gamedata.NewGameData()
+	world := InitializeWorld()
 	l := level.NewLevel(gd)
-	return &Game{GameData: gd, GameMap: gamedata2.NewGameMap(l), World: world}
+	return &Game{GameData: gd, GameMap: gamemap.NewGameMap(l), World: world}
 }
 
 // Update is called each tic.
@@ -44,8 +44,8 @@ func (g *Game) Update() error {
 
 	l := g.GameMap.CurrentLevel
 	for _, result := range g.World.Manager.Query(*g.World.Tags["players"]) {
-		player := result.Components[g.World.Player].(components.Movable)
-		player.Move(g.GameData, l, x, y) // ?????
+		player := result.Components[g.World.Player].(Movable)
+		player.Move(g.GameData, l, x, y)
 	}
 	return nil
 }
@@ -57,12 +57,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 func (g *Game) proccessRenderables(l *level.Level, screen *ebiten.Image) {
-	// iterate over all rendarable
-	// get his pos
-	// calc cords
-	// draw on screen
 	for _, result := range g.World.Manager.Query(*g.World.Tags["renderables"]) {
-		entity := result.Components[g.World.Renderable].(components.Renderable)
+		entity := result.Components[g.World.Renderable].(Renderable)
 		entity.Render(g.GameData, l, screen)
 	}
 }

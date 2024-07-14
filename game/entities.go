@@ -1,8 +1,8 @@
-package components
+package game
 
 import (
 	"github.com/FluffyFoxTail/gorogue/game/gamedata"
-	"github.com/FluffyFoxTail/gorogue/game/gamedata/level"
+	"github.com/FluffyFoxTail/gorogue/game/gamemap/level"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -15,14 +15,16 @@ type Entity struct {
 	X, Y  int
 }
 
+// TODO here use struct with concurent access???
 func (e *Entity) Move(gd *gamedata.GameData, l *level.Level, x, y int) {
-	index := l.GetIndexFromXY(x, y, gd)
+	index := l.GetIndexFromXY(e.X+x, e.Y+y, gd)
 	if !l.Tiles[index].Blocked {
-		e.X = x
-		e.Y = y
+		e.X += x
+		e.Y += y
 	}
 }
 
+// TODO also here use struct with concurent access???
 func (e *Entity) Render(gd *gamedata.GameData, l *level.Level, screen *ebiten.Image) {
 	index := l.GetIndexFromXY(e.X, e.Y, gd)
 	tile := l.Tiles[index]

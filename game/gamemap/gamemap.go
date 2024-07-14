@@ -1,7 +1,7 @@
-package gamedata
+package gamemap
 
 import (
-	"github.com/FluffyFoxTail/gorogue/game/gamedata/level"
+	"github.com/FluffyFoxTail/gorogue/game/gamemap/level"
 )
 
 // GameMap holds all levels and information about current game session

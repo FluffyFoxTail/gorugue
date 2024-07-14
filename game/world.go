@@ -1,7 +1,6 @@
-package ecs_system
+package game
 
 import (
-	"github.com/FluffyFoxTail/gorogue/ecs_system/components"
 	"github.com/bytearena/ecs"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"log"
@@ -26,7 +25,7 @@ func InitializeWorld() *World {
 	player := manager.NewComponent()
 	renderable := manager.NewComponent()
 
-	playerEntity := &components.Player{Entity: &components.Entity{Image: playerAsset, X: 40, Y: 25}}
+	playerEntity := &Player{Entity: &Entity{Image: playerAsset, X: 40, Y: 25}}
 
 	manager.NewEntity().
 		AddComponent(player, playerEntity).

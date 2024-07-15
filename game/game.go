@@ -17,9 +17,10 @@ type Game struct {
 // NewGame creates a new Game Object and initializes the data
 func NewGame() *Game {
 	gd := gamedata.NewGameData()
-	world := InitializeWorld()
 	l := level.NewLevel(gd)
-	return &Game{GameData: gd, GameMap: gamemap.NewGameMap(l), World: world}
+	gmap := gamemap.NewGameMap(l)
+	world := InitializeWorld(gmap.CurrentLevel)
+	return &Game{GameData: gd, GameMap: gmap, World: world}
 }
 
 // Update is called each tic.

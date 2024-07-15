@@ -2,19 +2,29 @@ package level
 
 import (
 	"github.com/FluffyFoxTail/gorogue/game/gamedata"
+	"github.com/FluffyFoxTail/gorogue/game/gamemap/dice"
 	"github.com/FluffyFoxTail/gorogue/game/gamemap/level/maptile"
+	"github.com/FluffyFoxTail/gorogue/game/gamemap/level/room"
 	"github.com/hajimehoshi/ebiten/v2"
+)
+
+const (
+	MIN_ROOM_SIZE   = 6
+	MAX__ROOM_SIZE  = 10
+	MAX_ROOMS_COUNT = 30
 )
 
 // Level hold information about tile for dungeon level
 type Level struct {
 	Tiles []*maptile.MapTile
+	Rooms []*room.Rectangle
 }
 
 // NewLevel create a new game level in dungeon
 func NewLevel(gd *gamedata.GameData) (level *Level) {
 	level = &Level{}
-	level.Tiles = level.CreateTiles(gd)
+	level.Rooms = make([]*room.Rectangle, 0)
+	level.GenerateLevelTiles(gd)
 	return
 }
 
@@ -29,21 +39,57 @@ func (l *Level) DrawLevel(gd *gamedata.GameData, screen *ebiten.Image) {
 		}
 	}
 }
+
+// GenerateLevelTiles creates a new Dungeon Level Map.
+func (l *Level) GenerateLevelTiles(gd *gamedata.GameData) {
+	tiles := l.CreateTiles(gd)
+	l.Tiles = tiles
+
+	for idx := 0; idx < MAX_ROOMS_COUNT; idx++ {
+		w := dice.GetRandomBetween(MIN_ROOM_SIZE, MAX__ROOM_SIZE)
+		h := dice.GetRandomBetween(MIN_ROOM_SIZE, MAX__ROOM_SIZE)
+		x := dice.GetDiceRoll(gd.ScreenWidth-w-1) - 1
+		y := dice.GetDiceRoll(gd.ScreenHeight-h-1) - 1
+
+		newRoom := room.NewRectangle(x, y, w, h)
+		isCanAddOnMap := true
+		for _, otherRoom := range l.Rooms {
+			if newRoom.IsIntersect(otherRoom) {
+				isCanAddOnMap = false
+				break
+			}
+		}
+
+		if isCanAddOnMap {
+			l.createRoom(newRoom, gd)
+			l.Rooms = append(l.Rooms, newRoom)
+		}
+	}
+}
+
 func (l *Level) CreateTiles(gd *gamedata.GameData) []*maptile.MapTile {
-	tiles := make([]*maptile.MapTile, 0)
+	tiles := make([]*maptile.MapTile, gd.ScreenHeight*gd.ScreenWidth)
+	index := 0
 
 	for x := 0; x < gd.ScreenWidth; x++ {
 		for y := 0; y < gd.ScreenHeight; y++ {
-			if x == 0 || x == gd.ScreenWidth-1 || y == 0 || y == gd.ScreenHeight-1 {
-				wall := maptile.NewMapTale(maptile.WALL, x*gd.TileWidth, y*gd.TileHeight, true)
-				tiles = append(tiles, wall)
-			} else {
-				floor := maptile.NewMapTale(maptile.FLOOR, x*gd.TileWidth, y*gd.TileHeight, false)
-				tiles = append(tiles, floor)
-			}
+			index = l.GetIndexFromXY(x, y, gd)
+			wall := maptile.NewMapTale(maptile.WALL, x*gd.TileWidth, y*gd.TileHeight, true)
+			tiles[index] = wall
 		}
 	}
 	return tiles
+}
+
+func (l *Level) createRoom(room *room.Rectangle, gd *gamedata.GameData) {
+	for y := room.Y1 + 1; y < room.Y2; y++ {
+		for x := room.X1 + 1; x < room.X2; x++ {
+			index := l.GetIndexFromXY(x, y, gd)
+			l.Tiles[index].Blocked = false
+			floor := maptile.NewMapTale(maptile.FLOOR, x, y, false)
+			l.Tiles[index] = floor
+		}
+	}
 }
 
 // GetIndexFromXY gets the index of the map array from a given X,Y TILE coordinate.

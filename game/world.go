@@ -1,6 +1,7 @@
 package game
 
 import (
+	"github.com/FluffyFoxTail/gorogue/game/gamemap/level"
 	"github.com/bytearena/ecs"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"log"
@@ -13,7 +14,7 @@ type World struct {
 	Tags       map[string]*ecs.Tag
 }
 
-func InitializeWorld() *World {
+func InitializeWorld(startingLevel *level.Level) *World {
 	tags := make(map[string]*ecs.Tag)
 	manager := ecs.NewManager()
 
@@ -25,7 +26,9 @@ func InitializeWorld() *World {
 	player := manager.NewComponent()
 	renderable := manager.NewComponent()
 
-	playerEntity := &Player{Entity: &Entity{Image: playerAsset, X: 40, Y: 25}}
+	startingRoom := startingLevel.Rooms[0]
+	x, y := startingRoom.Center()
+	playerEntity := &Player{Entity: &Entity{Image: playerAsset, X: x, Y: y}}
 
 	manager.NewEntity().
 		AddComponent(player, playerEntity).

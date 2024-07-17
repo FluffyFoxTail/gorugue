@@ -18,7 +18,7 @@ func InitializeWorld(startingLevel *level.Level) *World {
 	tags := make(map[string]*ecs.Tag)
 	manager := ecs.NewManager()
 
-	playerAsset, _, err := ebitenutil.NewImageFromFile("assets/char.png")
+	playerAsset, _, err := ebitenutil.NewImageFromFile("assets/knight32.png")
 	if err != nil {
 		log.Fatal(err)
 	}

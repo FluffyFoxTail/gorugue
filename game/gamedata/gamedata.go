@@ -11,9 +11,9 @@ type GameData struct {
 // NewGameData create fulfilled GameData struct
 func NewGameData() *GameData {
 	return &GameData{
-		ScreenWidth:  80,
-		ScreenHeight: 50,
-		TileWidth:    16,
-		TileHeight:   16,
+		ScreenWidth:  40,
+		ScreenHeight: 25,
+		TileWidth:    32,
+		TileHeight:   32,
 	}
 }

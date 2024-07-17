@@ -3,6 +3,7 @@ package maptile
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	_ "image/png"
 	"log"
 )
 
@@ -13,6 +14,7 @@ const (
 	FLOOR TileType = iota
 	CHAR  TileType = iota
 	WALL  TileType = iota
+	HALLWAY
 )
 
 // MapTile represent each object on level
@@ -28,11 +30,13 @@ func NewMapTale(tileType TileType, pixelX, pixelY int, blocked bool) *MapTile {
 	var file string
 	switch tileType {
 	case FLOOR:
-		file = "assets/floor2.png"
+		file = "assets/floor32.png"
 	case CHAR:
-		file = "assets/char.png"
+		file = "assets/knight32.png"
 	case WALL:
-		file = "assets/wall2.png"
+		file = "assets/wall32.png"
+	case HALLWAY:
+		file = "assets/hallway32.png"
 	}
 	fromFile, _, err := ebitenutil.NewImageFromFile(file)
 	if err != nil {

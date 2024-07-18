@@ -12,6 +12,8 @@ type Game struct {
 	*gamedata.GameData
 	*gamemap.GameMap
 	World *World
+	MoveState
+	MoveCount int
 }
 
 // NewGame creates a new Game Object and initializes the data
@@ -20,34 +22,44 @@ func NewGame() *Game {
 	l := level.NewLevel(gd)
 	gmap := gamemap.NewGameMap(l)
 	world := InitializeWorld(gmap.CurrentLevel)
-	return &Game{GameData: gd, GameMap: gmap, World: world}
+	return &Game{GameData: gd, GameMap: gmap, World: world, MoveState: PlayerMove, MoveCount: 0}
 }
 
 // Update is called each tic.
 func (g *Game) Update() error {
-	x, y := 0, 0
-	if ebiten.IsKeyPressed(ebiten.KeyUp) {
-		y = -1
-		println("y-1")
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyDown) {
-		y = 1
-		println("y 1")
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
-		x = -1
-		println("x-1")
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyRight) {
-		x = 1
-		println("x 1")
-	}
+	g.MoveCount++
+	if g.MoveState == PlayerMove && g.MoveCount > 10 {
+		x, y := 0, 0
+		if ebiten.IsKeyPressed(ebiten.KeyUp) {
+			y = -1
+			println("y-1")
+		}
+		if ebiten.IsKeyPressed(ebiten.KeyDown) {
+			y = 1
+			println("y 1")
+		}
+		if ebiten.IsKeyPressed(ebiten.KeyLeft) {
+			x = -1
+			println("x-1")
+		}
+		if ebiten.IsKeyPressed(ebiten.KeyRight) {
+			x = 1
+			println("x 1")
+		}
 
-	l := g.GameMap.CurrentLevel
-	for _, result := range g.World.Manager.Query(*g.World.Tags["players"]) {
-		player := result.Components[g.World.Player].(Movable)
-		player.Move(g.GameData, l, x, y)
+		l := g.GameMap.CurrentLevel
+		for _, result := range g.World.Manager.Query(*g.World.Tags["players"]) {
+			player := result.Components[g.World.Player].(Movable)
+			player.Move(g.GameData, l, x, y)
+		}
+
+		if x != 0 || y != 0 {
+			g.MoveState = GetNextState(g.MoveState)
+			g.MoveCount = 0
+		}
 	}
+	g.MoveState = PlayerMove
+
 	return nil
 }
 

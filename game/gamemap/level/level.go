@@ -7,6 +7,7 @@ import (
 	"github.com/FluffyFoxTail/gorogue/game/gamemap/level/room"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/norendren/go-fov/fov"
 	"log"
 )
 
@@ -18,8 +19,9 @@ const (
 
 // Level hold information about tile for dungeon level
 type Level struct {
-	Tiles []*maptile.MapTile
-	Rooms []*room.Rectangle
+	Tiles         []*maptile.MapTile
+	Rooms         []*room.Rectangle
+	PlayerVisible fov.View
 }
 
 // NewLevel create a new game level in dungeon
@@ -33,11 +35,13 @@ func NewLevel(gd *gamedata.GameData) (level *Level) {
 func (l *Level) DrawLevel(gd *gamedata.GameData, screen *ebiten.Image) {
 	for x := 0; x < gd.ScreenWidth; x++ {
 		for y := 0; y < gd.ScreenHeight; y++ {
-			tile := l.Tiles[l.GetIndexFromXY(x, y, gd)]
-			options := &ebiten.DrawImageOptions{}
+			if l.PlayerVisible.IsVisible(x, y) {
+				tile := l.Tiles[l.GetIndexFromXY(x, y, gd)]
+				options := &ebiten.DrawImageOptions{}
 
-			options.GeoM.Translate(float64(tile.PixelX), float64(tile.PixelY))
-			screen.DrawImage(tile.Image, options)
+				options.GeoM.Translate(float64(tile.PixelX), float64(tile.PixelY))
+				screen.DrawImage(tile.Image, options)
+			}
 		}
 	}
 }
@@ -146,4 +150,18 @@ func (l *Level) createVerticalTunnel(y1, y2, x int, gd *gamedata.GameData) {
 // This coordinate is logical tiles, not pixels.
 func (l *Level) GetIndexFromXY(x int, y int, gd *gamedata.GameData) int {
 	return (y * gd.ScreenWidth) + x
+}
+
+func (l *Level) InBounds(x, y int) bool {
+	gd := gamedata.NewGameData()
+	if x < 0 || x >= gd.ScreenWidth || y < 0 || y >= gd.ScreenHeight {
+		return false
+	}
+	return true
+}
+
+// check for WALL, not blocked
+func (l *Level) IsOpaque(x, y int) bool {
+	index := l.GetIndexFromXY(x, y, gamedata.NewGameData())
+	return l.Tiles[index].Blocked
 }

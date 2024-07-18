@@ -21,6 +21,7 @@ func (e *Entity) Move(gd *gamedata.GameData, l *level.Level, x, y int) {
 	if !l.Tiles[index].Blocked {
 		e.X += x
 		e.Y += y
+		l.PlayerVisible.Compute(l, e.X, e.Y, 8)
 	}
 }
 
